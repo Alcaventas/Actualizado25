@@ -18,11 +18,11 @@ global.suittag = ['5219993404349'];
 global.prems = ['51995386439'];
 
 global.packname = 'Sticker';
-global.author = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧|² ⁴';
-global.wm = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧|² ⁴';
-global.titulowm = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧|² ⁴';
-global.titulowm2 = `𝗔𝗟𝗖𝗔𝗕𝗢𝗧|² ⁴`
-global.igfg = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧|² ⁴';
+global.author = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
+global.wm = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
+global.titulowm = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
+global.titulowm2 = `𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1`
+global.igfg = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
 global.wait = '*[ ⏳ ] Cargando...*';
 
 global.imagen1 = fs.readFileSync('./Menu2.jpg');
@@ -43,9 +43,9 @@ global.año = d.toLocaleDateString('es', {year: 'numeric'});
 global.tiempo = d.toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true});
 //* ****************************
 global.wm2 = `${dia} ${fecha}\n𝗔𝗟𝗖𝗔𝗕𝗢𝗧`;
-global.gt = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧';
-global.mysticbot = '𝗔𝗟𝗖𝗔𝗕𝗢𝗧';
-global.md = 'https://github.com/BrunoSobrino/TheMystic-Bot-MD';
+global.gt = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
+global.mysticbot = '𝘼𝙡𝙘𝙖𝙗𝙤𝙩 𝙫.1';
+global.md = 'www.instagram.com/alcashop.ff';
 global.mysticbot = 'https://github.com/BrunoSobrino/TheMystic-Bot-MD';
 global.waitt = '*[ ⏳ ] Cargando...*';
 global.waittt = '*[ ⏳ ] Cargando...*';
