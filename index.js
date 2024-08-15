@@ -14,92 +14,68 @@ const {say} = cfonts;
 const rl = createInterface(process.stdin, process.stdout);
 
 say('The Mystic\nBot', {
-font: 'chrome',
-align: 'center',
-gradient: ['red', 'magenta']})
-say(`hola mi amor te amo mucho<3`, {
-font: 'console',
-align: 'center',
-gradient: ['red', 'magenta']})
+  font: 'chrome',
+  align: 'center',
+  gradient: ['red', 'magenta']});
+say(`Bot creado por Bruno Sobrino`, {
+  font: 'console',
+  align: 'center',
+  gradient: ['red', 'magenta']});
 
-var isRunning = false
+let isRunning = false;
+/**
+* Start a js file
+* @param {String} file `path/to/file`
+*/
+function start(file) {
+  if (isRunning) return;
+  isRunning = true;
+  const args = [join(__dirname, file), ...process.argv.slice(2)];
 
-async function start(file) {
-if (isRunning) return
-isRunning = true
-const currentFilePath = new URL(import.meta.url).pathname
-let args = [join(__dirname, file), ...process.argv.slice(2)]
-say([process.argv[0], ...args].join(' '), {
-font: 'console',
-align: 'center',
-gradient: ['red', 'magenta']
-})
-setupMaster({exec: args[0], args: args.slice(1),
-})
-let p = fork()
-p.on('message', data => {
-switch (data) {
-case 'reset':
-p.process.kill()
-isRunning = false
-start.apply(this, arguments)
-break
-case 'uptime':
-p.send(process.uptime())
-break
-}})
+  /** say('[ ℹ️ ] Escanea el código QR o introduce el código de emparejamiento en WhatsApp.', {
+    font: 'console',
+    align: 'center',
+    gradient: ['red', 'magenta']}); **/
 
-p.on('exit', (_, code) => {
-isRunning = false
-console.error('⚠️ ERROR ⚠️ >> ', code)
-start('main.js'); //
+  setupMaster({
+    exec: args[0],
+    args: args.slice(1)});
+  const p = fork();
+  p.on('message', (data) => {
+    
+    console.log('[RECIBIDO]', data);
+    switch (data) {
+      case 'reset':
+        p.process.kill();
+        isRunning = false;
+        start.apply(this, arguments);
+        break;
+      case 'uptime':
+        p.send(process.uptime());
+        break;
+    }
+  });
+  p.on('exit', (_, code) => {
+    isRunning = false;
+    console.error('[ ℹ️ ] Ocurrio un error inesperado:', code);
 
-if (code === 0) return
-watchFile(args[0], () => {
-unwatchFile(args[0])
-start(file)
-})})
+    p.process.kill();
+    isRunning = false;
+    start.apply(this, arguments);
 
-const ramInGB = os.totalmem() / (1024 * 1024 * 1024);
-const freeRamInGB = os.freemem() / (1024 * 1024 * 1024);
-const packageJsonPath = path.join(path.dirname(currentFilePath), './package.json');
-try {
-const packageJsonData = await fsPromises.readFile(packageJsonPath, 'utf-8');
-const packageJsonObj = JSON.parse(packageJsonData);
-const currentTime = new Date().toLocaleString();
-let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》'
-console.log(chalk.yellow(`╭${lineM}
-┊${chalk.blueBright('╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
-┊${chalk.blueBright('┊')}${chalk.yellow(`🖥️ ${os.type()}, ${os.release()} - ${os.arch()}`)}
-┊${chalk.blueBright('┊')}${chalk.yellow(`💾 Total RAM: ${ramInGB.toFixed(2)} GB`)}
-┊${chalk.blueBright('┊')}${chalk.yellow(`💽 Free RAM: ${freeRamInGB.toFixed(2)} GB`)}
-┊${chalk.blueBright('╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
-┊${chalk.blueBright('╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
-┊${chalk.blueBright('┊')} ${chalk.blue.bold(`🟢INFORMACIÓN :`)}
-┊${chalk.blueBright('┊')} ${chalk.blueBright('┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')} 
-┊${chalk.blueBright('┊')}${chalk.cyan(`💚 Nombre: ${packageJsonObj.name}`)}
-┊${chalk.blueBright('┊')}${chalk.cyan(`𓃠 Versión: ${packageJsonObj.version}`)}
-┊${chalk.blueBright('┊')}${chalk.cyan(`💜 Descripción: ${packageJsonObj.description}`)}
-┊${chalk.blueBright('┊')}${chalk.cyan(`😺 Project Author: Alcashop`)}
-┊${chalk.blueBright('┊')}${chalk.blueBright('┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')} 
-┊${chalk.blueBright('┊')}${chalk.yellow(`💜 Colaboradores:`)}
-┊${chalk.blueBright('┊')}${chalk.yellow(`• Alcashop`)}
-┊${chalk.blueBright('┊')}${chalk.yellow(`• Alcashop`)}
-┊${chalk.blueBright('╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')} 
-┊${chalk.blueBright('╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
-┊${chalk.blueBright('┊')}${chalk.cyan(`⏰ Hora Actual :`)}
-┊${chalk.blueBright('┊')}${chalk.cyan(`${currentTime}`)}
-┊${chalk.blueBright('╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')} 
-╰${lineM}`));
-setInterval(() => {}, 1000);
-} catch (err) {
-console.error(chalk.red(`❌ No se pudo leer el archivo package.json: ${err}`));
+    if (process.env.pm_id) {
+      process.exit(1);
+    } else {
+      process.exit();
+    }
+  });
+  const opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
+  if (!opts['test']) {
+    if (!rl.listenerCount()) {
+      rl.on('line', (line) => {
+        p.emit('message', line.trim());
+      });
+    }
+  }
 }
-
-let opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
-if (!opts['test'])
-if (!rl.listenerCount()) rl.on('line', line => {
-p.emit('message', line.trim())
-})}
-
-start('main.js')
+start('main.js');
