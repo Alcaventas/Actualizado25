@@ -1,5 +1,5 @@
-import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
-import { smsg } from './lib/simple.js';
+import { generateWAMessageFromContent } from "baileys";
+import { smsg } from './src/libraries/simple.js';
 import { format } from 'util';
 import { fileURLToPath } from 'url';
 import path, { join } from 'path';
@@ -8,11 +8,12 @@ import fs from 'fs';
 import chalk from 'chalk';
 import mddd5 from 'md5';
 import ws from 'ws';
+let mconn;
 
 /**
- * @type {import('@whiskeysockets/baileys')}
+ * @type {import("baileys")}
  */
-const { proto } = (await import('@whiskeysockets/baileys')).default;
+const { proto } = (await import("baileys")).default;
 const isNumber = (x) => typeof x === 'number' && !isNaN(x);
 const delay = (ms) => isNumber(ms) && new Promise((resolve) => setTimeout(function () {
   clearTimeout(this);
@@ -21,7 +22,7 @@ const delay = (ms) => isNumber(ms) && new Promise((resolve) => setTimeout(functi
 
 /**
  * Handle messages upsert
- * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate
+ * @param {import("baileys").BaileysEventMap<unknown>['messages.upsert']} groupsUpdate
  */
 export async function handler(chatUpdate) {
   this.msgqueque = this.msgqueque || [];
@@ -46,6 +47,7 @@ export async function handler(chatUpdate) {
       return;
     }
     global.mconn = m
+    mconn = m
     m.exp = 0;
     m.money = false;
     m.limit = false;
@@ -71,6 +73,7 @@ export async function handler(chatUpdate) {
         if (!isNumber(user.money)) user.money = 15;
         if (!('language' in user)) user.language = 'es';
         if (!('registered' in user)) user.registered = false;
+        if (!('mute' in user)) user.mute = false
         if (!user.registered) {
           if (!('name' in user)) user.name = m.name;
           if (!isNumber(user.age)) user.age = -1;
@@ -608,6 +611,7 @@ export async function handler(chatUpdate) {
           gadodado: 0,
           gajah: 0,
           gamemines: false,
+          mute: false,
           ganja: 0,
           gardenboxs: 0,
           gems: 0,
@@ -901,6 +905,7 @@ export async function handler(chatUpdate) {
           wood: 0,
           wortel: 0,
           language: 'es',
+          gameglx: {},
         };
       }
       const akinator = global.db.data.users[m.sender].akinator;
@@ -930,12 +935,200 @@ export async function handler(chatUpdate) {
           soal: null,
         };
       }
+      const gameglx = global.db.data.users[m.sender].gameglx
+      if (typeof gameglx !== 'object') {
+        gameglx = global.db.data.users[m.sender].gameglx = {}
+      }
+      if (gameglx) {
+
+        if (!('status' in gameglx)) gameglx.status = false;
+        if (!('notificacao' in gameglx)) gameglx.notificacao = {};
+        if (!('recebidas' in gameglx.notificacao)) gameglx.notificacao.recebidas = [];
+        // Perfil
+        if (!('perfil' in gameglx)) gameglx.perfil = {};
+        if (!('nome' in gameglx.perfil)) gameglx.perfil.nome = null;
+        if (!('poder' in gameglx.perfil)) gameglx.perfil.poder = 500;
+        if (!('nivel' in gameglx.perfil)) gameglx.perfil.nivel = {};
+        if (!('nome' in gameglx.perfil.nivel)) gameglx.perfil.nivel.nome = 'Iniciante';
+        if (!('id' in gameglx.perfil.nivel)) gameglx.perfil.nivel.id = 0;
+        if (!('proximoNivel' in gameglx.perfil.nivel)) gameglx.perfil.nivel.proximoNivel = 1;
+        if (!('xp' in gameglx.perfil)) gameglx.perfil.xp = 112;
+        if (!('idioma' in gameglx.perfil)) gameglx.perfil.idioma = 'pt-br'; // Definindo padrão 
+        if (!('minerando' in gameglx.perfil)) gameglx.perfil.minerando = false;
+        if (!('id' in gameglx.perfil)) gameglx.perfil.id = null;
+        if (!('username' in gameglx.perfil)) gameglx.perfil.username = null;
+        // Casa
+        if (!('casa' in gameglx.perfil)) gameglx.perfil.casa = {};
+        if (!('id' in gameglx.perfil.casa)) gameglx.perfil.casa.id = null;
+        if (!('idpelonome' in gameglx.perfil.casa)) gameglx.perfil.casa.idpelonome = 'terra';
+        if (!('planeta' in gameglx.perfil.casa)) gameglx.perfil.casa.planeta = null;
+        if (!('colonia' in gameglx.perfil.casa)) gameglx.perfil.casa.colonia = null; // Definir como null em vez de objeto vazio
+        if (gameglx.perfil.casa.colonia === null) gameglx.perfil.casa.colonia = {}; // Verificar se é null antes de definir como objeto vazio
+        if (!('nome' in gameglx.perfil.casa.colonia)) gameglx.perfil.casa.colonia.nome = null;
+        if (!('id' in gameglx.perfil.casa.colonia)) gameglx.perfil.casa.colonia.id = 1;
+        if (!('habitante' in gameglx.perfil.casa.colonia)) gameglx.perfil.casa.colonia.habitante = false;
+
+        // Carteira Dinheiro
+        if (!('carteira' in gameglx.perfil)) gameglx.perfil.carteira = {};
+        if (!('currency' in gameglx.perfil.carteira)) gameglx.perfil.carteira.currency = 'BRL'; // Definindo padrão 
+        if (!('saldo' in gameglx.perfil.carteira)) gameglx.perfil.carteira.saldo = 1500;
+        // localizacao
+        if (!('localizacao' in gameglx.perfil)) gameglx.perfil.localizacao = {};
+        if (!('status' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.status = false;
+        if (!('nomeplaneta' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.nomeplaneta = null;
+        if (!('idpelonome' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.idpelonome = null;
+        if (!('viajando' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.idpelonome = false;
+        if (!('id' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.id = null;
+        //Posição  na casa Colonia
+        if (!('posicao' in gameglx.perfil.casa.colonia)) gameglx.perfil.casa.colonia.posicao = {};
+        if (!('x' in gameglx.perfil.casa.colonia.posicao)) gameglx.perfil.casa.colonia.posicao.x = 0;
+        if (!('y' in gameglx.perfil.casa.colonia.posicao)) gameglx.perfil.casa.colonia.posicao.y = 0;
+        
+        //Posição  em viagens se necessario
+        if (!('posicao' in gameglx.perfil.localizacao)) gameglx.perfil.localizacao.posicao = {};
+        if (!('x' in gameglx.perfil.localizacao.posicao)) gameglx.perfil.localizacao.posicao.x = 0;
+        if (!('y' in gameglx.perfil.localizacao.posicao)) gameglx.perfil.localizacao.posicao.y = 0;
+        // nave
+        if (!('nave' in gameglx.perfil)) gameglx.perfil.nave = {};
+        if (!('nome' in gameglx.perfil.nave)) gameglx.perfil.nave.status = false;
+        if (!('id' in gameglx.perfil.nave)) gameglx.perfil.nave.id = null;
+        if (!('nome' in gameglx.perfil.nave)) gameglx.perfil.nave.nome = null;
+        if (!('velocidade' in gameglx.perfil.nave)) gameglx.perfil.nave.velocidade = null;
+        if (!('poder' in gameglx.perfil.nave)) gameglx.perfil.nave.poder = null;
+        if (!('valor' in gameglx.perfil.nave)) gameglx.perfil.nave.valor = null;
+        // Bolsa
+        if (!('bolsa' in gameglx.perfil)) gameglx.perfil.bolsa = {};
+        if (!('itens' in gameglx.perfil.bolsa)) gameglx.perfil.bolsa.itens = {};
+        if (!('madeira' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.madeira = 1
+        if (!('ferro' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.ferro = 1
+        if (!('diamante' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.diamante = 1
+        if (!('esmeralda' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.esmeralda = 1
+        if (!('carvao' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.carvao = 1
+        if (!('ouro' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.ouro = 1
+        if (!('quartzo' in gameglx.perfil.bolsa.itens)) gameglx.perfil.bolsa.itens.quartzo = 1
+        // Bolsa - naves
+        if (!('naves' in gameglx.perfil.bolsa)) gameglx.perfil.bolsa.naves = {};
+        if (!('compradas' in gameglx.perfil.bolsa.naves)) gameglx.perfil.bolsa.naves.compradas = [];
+        if (!('status' in gameglx.perfil.bolsa.naves)) gameglx.perfil.bolsa.naves.status = false;
+        // Função de ataque 
+        if(!('ataque' in gameglx.perfil)) gameglx.perfil.ataque = null
+        if (gameglx.perfil.ataque === null) gameglx.perfil.ataque = {};
+        if (!('sendoAtacado' in gameglx.perfil.ataque)) gameglx.perfil.ataque.sendoAtacado = {};
+        if (!('status' in gameglx.perfil.ataque.sendoAtacado)) gameglx.perfil.ataque.sendoAtacado.status = false;
+        if (!('atacante' in gameglx.perfil.ataque.sendoAtacado)) gameglx.perfil.ataque.sendoAtacado.atacante = null;
+        if (!('forcaAtaque' in gameglx.perfil.ataque)) gameglx.perfil.ataque.forcaAtaque = {};
+        if (!('ataque' in gameglx.perfil.ataque.forcaAtaque)) gameglx.perfil.ataque.forcaAtaque.ataque = 10;
+        if (!('data' in gameglx.perfil.ataque)) gameglx.perfil.ataque.data = {};
+        if (!('dia' in gameglx.perfil.ataque.data)) gameglx.perfil.ataque.data.dia = 0;
+        if (!('hora' in gameglx.perfil.ataque.data)) gameglx.perfil.ataque.data.hora = 0;
+        if (!('contagem' in gameglx.perfil.ataque.data)) gameglx.perfil.ataque.data.contagem = 0;
+        // Defesa
+        if(!('defesa' in gameglx.perfil)) gameglx.perfil.defesa = {};
+        if(!('forca' in gameglx.perfil.defesa)) gameglx.perfil.defesa.forca = 100;
+        if(!('ataque' in gameglx.perfil.defesa)) gameglx.perfil.defesa.ataque = 40 ;
+
+
+      } else {
+        global.db.data.users[m.sender].gameglx = {
+          status: false,
+          notificacao: {
+            recebidas:[]
+          },
+          perfil: {
+            xp: 112,
+            nivel: {
+              nome: 'Iniciante',
+              id: 0,
+              proximoNivel: 1
+            },
+            poder: 500,
+            minerando: false,
+            nome: null,
+            username: null,
+            id: null, // Id do Jogador
+            idioma: 'pt-br',
+            casa: {
+              id: null, // id do grupo ou seja do planeta casa
+              planeta: null,
+              idpelonome: 'terra',
+              colonia: {
+                id: 1,
+                nome: null,
+                habitante: false,
+                posicao: {
+                  x: 0,
+                  y: 0,
+                }
+              },
+
+            },
+            carteira: {
+              currency: 'BRL',
+              saldo: 1500,
+            },
+            localizacao: {
+              status: false,
+              nomeplaneta: null,  // id do grupo...
+              id: null,
+              idpelonome: null,
+              viajando: false,
+              posicao: {
+                x: 0,
+                y: 0,
+              }
+            },
+            nave: {
+              status: false,
+              id: null,
+              nome: null,
+              velocidade: null,
+              poder: null,
+              valor: null,
+
+            },
+            bolsa: {
+              itens: {
+                madeira: 1,
+                ferro: 1,
+                diamante: 1,
+                esmeralda: 2,
+                carvao: 1,
+                ouro: 1,
+                quartzo: 1
+              },
+              naves: {
+                status: false,
+                compradas: []
+              }
+            },
+            ataque: {
+              data: {
+                hora: 0,
+                contagem: 0 
+              },
+              sendoAtacado: {
+                status: false,
+                atacante: null,
+              },
+              forcaAtaque : {
+                ataque: 10
+              }
+            },
+            defesa : {
+              forca: 200,
+              ataque: 30
+            }
+          }
+        };
+      }
+
+
       const chat = global.db.data.chats[m.chat];
       if (typeof chat !== 'object') {
         global.db.data.chats[m.chat] = {};
       }
       if (chat) {
-        //if (!('language' in chat)) chat.language = 'es';
+        if (!('language' in chat)) chat.language = 'es';
         if (!('isBanned' in chat)) chat.isBanned = false;
         if (!('welcome' in chat)) chat.welcome = true;
         if (!('detect' in chat)) chat.detect = true;
@@ -1020,8 +1213,8 @@ export async function handler(chatUpdate) {
       console.error(e);
     }
 
-    const idioma = global.db.data.users[m.sender].language
-    const _translate = JSON.parse(fs.readFileSync(`./language/${idioma}.json`))
+    const idioma = global.db.data.users[m.sender]?.language || 'es';
+    const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
     const tradutor = _translate.handler.handler
 
     if (opts['nyimak']) {
@@ -1057,7 +1250,7 @@ export async function handler(chatUpdate) {
       }, time);
     }
 
-    if (m.isBaileys) {
+    if (m.isBaileys || isBaileysFail && m?.sender === mconn?.conn?.user?.jid) {
       return;
     }
     m.exp += Math.ceil(Math.random() * 10);
@@ -1405,7 +1598,7 @@ ${tradutor.texto1[1]} ${messageNumber}/3
     }
 
     try {
-      if (!opts['noprint']) await (await import(`./lib/print.js`)).default(m, this);
+      if (!opts['noprint']) await (await import(`./src/libraries/print.js`)).default(m, this);
     } catch (e) {
       console.log(m, m.quoted, e);
     }
@@ -1417,15 +1610,15 @@ ${tradutor.texto1[1]} ${messageNumber}/3
 
 /**
  * Handle groups participants update
- * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate
+ * @param {import("baileys").BaileysEventMap<unknown>['group-participants.update']} groupsUpdate
  */
 export async function participantsUpdate({ id, participants, action }) {
   /************************
    * Opção de tradução de idioma
    * 
    ***********************/
-  const idioma = global.db.data.chats[id].language || 'es';
-  const _translate = JSON.parse(fs.readFileSync(`./language/${idioma}.json`))
+  const idioma = global?.db?.data?.chats[id]?.language || 'es';
+  const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
   const tradutor = _translate.handler.participantsUpdate
 
   const m = mconn
@@ -1433,23 +1626,23 @@ export async function participantsUpdate({ id, participants, action }) {
   //if (m.conn.isInit) return;
   if (global.db.data == null) await loadDatabase();
   const chat = global.db.data.chats[id] || {};
-  const botTt = global.db.data.settings[m.conn.user.jid] || {};
+  const botTt = global.db.data.settings[mconn?.conn?.user?.jid] || {};
   let text = '';
   switch (action) {
     case 'add':
     case 'remove':
       if (chat.welcome && !chat?.isBanned) {
-        const groupMetadata = await m.conn.groupMetadata(id) || (conn.chats[id] || {}).metadata;
+        const groupMetadata = await m?.conn?.groupMetadata(id) || (conn?.chats[id] || {}).metadata;
         for (const user of participants) {
           let pp = 'https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/avatar_contact.png';
           try {
             pp = await m.conn.profilePictureUrl(user, 'image');
           } catch (e) {
           } finally {
-            const apii = await m.conn.getFile(pp);
+            const apii = await mconn?.conn?.getFile(pp);
             const antiArab = JSON.parse(fs.readFileSync('./src/antiArab.json'));
             const userPrefix = antiArab.some((prefix) => user.startsWith(prefix));
-            const botTt2 = groupMetadata.participants.find((u) => m.conn.decodeJid(u.id) == m.conn.user.jid) || {};
+            const botTt2 = groupMetadata?.participants?.find((u) => m?.conn?.decodeJid(u.id) == m?.conn?.user?.jid) || {};
             const isBotAdminNn = botTt2?.admin === 'admin' || false;
             text = (action === 'add' ? (chat.sWelcome || tradutor.texto1 || conn.welcome || 'Welcome, @user!').replace('@subject', await m.conn.getName(id)).replace('@desc', groupMetadata.desc?.toString() || '*𝚂𝙸𝙽 𝙳𝙴𝚂𝙲𝚁𝙸𝙿𝙲𝙸𝙾𝙽*') :
               (chat.sBye || tradutor.texto2 || conn.bye || 'Bye, @user!')).replace('@user', '@' + user.split('@')[0]);
@@ -1457,10 +1650,10 @@ export async function participantsUpdate({ id, participants, action }) {
               const responseb = await m.conn.groupParticipantsUpdate(id, [user], 'remove');
               if (responseb[0].status === '404') return;
               const fkontak2 = { 'key': { 'participants': '0@s.whatsapp.net', 'remoteJid': 'status@broadcast', 'fromMe': false, 'id': 'Halo' }, 'message': { 'contactMessage': { 'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${user.split('@')[0]}:${user.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` } }, 'participant': '0@s.whatsapp.net' };
-              await m.conn.sendMessage(id, { text: `*[❗] @${user.split('@')[0]} ᴇɴ ᴇsᴛᴇ ɢʀᴜᴘᴏ ɴᴏ sᴇ ᴘᴇʀᴍɪᴛᴇɴ ɴᴜᴍᴇʀᴏs ᴀʀᴀʙᴇs ᴏ ʀᴀʀᴏs, ᴘᴏʀ ʟᴏ ϙᴜᴇ sᴇ ᴛᴇ sᴀᴄᴀʀᴀ ᴅᴇʟ ɢʀᴜᴘᴏ*`, mentions: [user] }, { quoted: fkontak2 });
+              await m?.conn?.sendMessage(id, { text: `*[❗] @${user.split('@')[0]} ᴇɴ ᴇsᴛᴇ ɢʀᴜᴘᴏ ɴᴏ sᴇ ᴘᴇʀᴍɪᴛᴇɴ ɴᴜᴍᴇʀᴏs ᴀʀᴀʙᴇs ᴏ ʀᴀʀᴏs, ᴘᴏʀ ʟᴏ ϙᴜᴇ sᴇ ᴛᴇ sᴀᴄᴀʀᴀ ᴅᴇʟ ɢʀᴜᴘᴏ*`, mentions: [user] }, { quoted: fkontak2 });
               return;
             }
-            await m.conn.sendFile(id, apii.data, 'pp.jpg', text, null, false, { mentions: [user] });
+            await m?.conn?.sendFile(id, apii.data, 'pp.jpg', text, null, false, { mentions: [user] });
           }
         }
       }
@@ -1485,12 +1678,12 @@ export async function participantsUpdate({ id, participants, action }) {
 
 /**
  * Handle groups update
- * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate
+ * @param {import("baileys").BaileysEventMap<unknown>['groups.update']} groupsUpdate
  */
 export async function groupsUpdate(groupsUpdate) {
   //console.log(groupsUpdate)
   const idioma = global.db.data.chats[groupsUpdate[0].id]?.language || 'es';
-  const _translate = JSON.parse(fs.readFileSync(`./language/${idioma}.json`))
+  const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
   const tradutor = _translate.handler.participantsUpdate
 
   if (opts['self']) {
@@ -1513,12 +1706,12 @@ export async function groupsUpdate(groupsUpdate) {
 }
 
 export async function callUpdate(callUpdate) {
-  const isAnticall = global.db.data.settings[mconn.conn.user.jid].antiCall;
+  const isAnticall = global?.db?.data?.settings[mconn?.conn?.user?.jid].antiCall;
   if (!isAnticall) return;
   for (const nk of callUpdate) {
     if (nk.isGroup == false) {
       if (nk.status == 'offer') {
-        const callmsg = await mconn.conn.reply(nk.from, `Hola *@${nk.from.split('@')[0]}*, las ${nk.isVideo ? 'videollamadas' : 'llamadas'} no están permitidas, serás bloqueado.\n-\nSi accidentalmente llamaste póngase en contacto con mi creador para que te desbloquee!`, false, { mentions: [nk.from] });
+        const callmsg = await mconn?.conn?.reply(nk.from, `Hola *@${nk.from.split('@')[0]}*, las ${nk.isVideo ? 'videollamadas' : 'llamadas'} no están permitidas, serás bloqueado.\n-\nSi accidentalmente llamaste póngase en contacto con mi creador para que te desbloquee!`, false, { mentions: [nk.from] });
         // let data = global.owner.filter(([id, isCreator]) => id && isCreator)
         // await this.sendContact(nk.from, data.map(([id, name]) => [id, name]), false, { quoted: callmsg })
         const vcard = `BEGIN:VCARD\nVERSION:3.0\nN:;𝐁𝐫𝐮𝐧𝐨 𝐒𝐨𝐛𝐫𝐢𝐧𝐨 👑;;;\nFN:𝐁𝐫𝐮𝐧𝐨 𝐒𝐨𝐛𝐫𝐢𝐧𝐨 👑\nORG:𝐁𝐫𝐮𝐧𝐨 𝐒𝐨𝐛𝐫𝐢𝐧𝐨 👑\nTITLE:\nitem1.TEL;waid=5219992095479:+521 999 209 5479\nitem1.X-ABLabel:𝐁𝐫𝐮𝐧𝐨 𝐒𝐨𝐛𝐫𝐢𝐧𝐨 👑\nX-WA-BIZ-DESCRIPTION:[❗] ᴄᴏɴᴛᴀᴄᴛᴀ ᴀ ᴇsᴛᴇ ɴᴜᴍ ᴘᴀʀᴀ ᴄᴏsᴀs ɪᴍᴘᴏʀᴛᴀɴᴛᴇs.\nX-WA-BIZ-NAME:𝐁𝐫𝐮𝐧𝐨 𝐒𝐨𝐛𝐫𝐢𝐧𝐨 👑\nEND:VCARD`;
@@ -1532,8 +1725,8 @@ export async function callUpdate(callUpdate) {
 export async function deleteUpdate(message) {
   const datas = global
   const id = message.participant // Obtenga la identificación del usuario, solo dentro de esta función "deleteUpdate"
-  const idioma = datas.db.data.users[id].language || 'es';
-  const _translate = JSON.parse(fs.readFileSync(`./language/${idioma}.json`))
+  const idioma = datas.db.data.users[id]?.language || 'es';
+  const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
   const tradutor = _translate.handler.deleteUpdate
 
 
@@ -1564,7 +1757,7 @@ ${tradutor.texto1[5]}`.trim();
 global.dfail = (type, m, conn) => {
   const datas = global
   const idioma = datas.db.data.users[m.sender].language || 'es';
-  const _translate = JSON.parse(fs.readFileSync(`./language/${idioma}.json`))
+  const _translate = JSON.parse(fs.readFileSync(`./src/languages/${idioma}.json`))
   const tradutor = _translate.handler.dfail
 
   const msg = {
